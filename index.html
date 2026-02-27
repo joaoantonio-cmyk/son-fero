@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>my  home</title>
+
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="frases-bg" id="frasesBg"></div>
+
+<div class="center">
+
+<h1 class="titulo"> 🎧</h1>
+
+<div class="searchBox">
+    <input type="text" id="link" placeholder="cole o link do youtube...">
+    <button onclick="tocar()">▶</button>
+</div>
+
+<!-- PLAYER AREA -->
+<div class="mediaArea">
+
+    <!-- AUDIO PLAYER -->
+    <div class="audioPlayer" id="audioPlayer">
+        <img id="thumb" src="">
+        <div class="audioInfo">
+            <div id="audioTitulo">nenhuma música</div>
+            <button class="toggleVideoBtn" onclick="mostrarVideo()">assistir vídeo</button>
+        </div>
+    </div>
+
+    <!-- VIDEO PLAYER -->
+    <div class="mediaPlayer" id="videoBox">
+    <button class="voltarBtn" onclick="ocultarVideo()">voltar ao áudio</button>
+
+    <iframe id="videoFrame"
+    src=""
+    frameborder="0"
+    allow="autoplay; encrypted-media"
+    allowfullscreen></iframe>
+</div>
+
+</div>
+
+<div class="playerInfo">
+    <div class="agora">
+        <span>Tocando agora:</span>
+        <p id="nomeMusica">nenhuma música</p>
+    </div>
+
+    <div class="historico">
+        <span>Últimas tocadas</span>
+        <ul id="historicoLista"></ul>
+    </div>
+</div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
