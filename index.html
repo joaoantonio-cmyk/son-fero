@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>my  home</title>
+<title>sonífero</title>
 
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
@@ -11,54 +11,59 @@
 
 <body>
 
+<!-- popup nome -->
+<div class="namePopup" id="namePopup">
+  <div class="popupBox">
+    <h2>quem está ouvindo?</h2>
+    <input id="usernameInput" placeholder="seu nome...">
+    <button onclick="salvarNome()">entrar</button>
+  </div>
+</div>
+
 <div class="frases-bg" id="frasesBg"></div>
 
 <div class="center">
 
-<h1 class="titulo"> 🎧</h1>
+<h1 class="titulo">sonífero 🎧</h1>
+
+<div class="stats">
+  <div class="viewsBox">visitas: <b id="views">...</b></div>
+  <div class="onlineBox">ouvindo agora: <b id="onlineNow">...</b></div>
+</div>
 
 <div class="searchBox">
-    <input type="text" id="link" placeholder="cole o link do youtube...">
+    <input type="text" id="link" placeholder="cole link youtube ou spotify...">
     <button onclick="tocar()">▶</button>
 </div>
 
-<!-- PLAYER AREA -->
 <div class="mediaArea">
 
-    <!-- AUDIO PLAYER -->
     <div class="audioPlayer" id="audioPlayer">
-        <img id="thumb" src="">
+        <img id="thumb">
         <div class="audioInfo">
             <div id="audioTitulo">nenhuma música</div>
             <button class="toggleVideoBtn" onclick="mostrarVideo()">assistir vídeo</button>
         </div>
     </div>
 
-    <!-- VIDEO PLAYER -->
     <div class="mediaPlayer" id="videoBox">
-    <button class="voltarBtn" onclick="ocultarVideo()">voltar ao áudio</button>
-
-    <iframe id="videoFrame"
-    src=""
-    frameborder="0"
-    allow="autoplay; encrypted-media"
-    allowfullscreen></iframe>
-</div>
+        <button class="voltarBtn" onclick="ocultarVideo()">voltar ao áudio</button>
+        <iframe id="videoFrame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
 
 </div>
 
 <div class="playerInfo">
-    <div class="agora">
-        <span>Tocando agora:</span>
-        <p id="nomeMusica">nenhuma música</p>
-    </div>
-
-    <div class="historico">
-        <span>Últimas tocadas</span>
-        <ul id="historicoLista"></ul>
-    </div>
+    <span>Tocando agora:</span>
+    <p id="nomeMusica">nenhuma música</p>
+    <ul id="historicoLista"></ul>
 </div>
 
+</div>
+
+<div class="rankingBox">
+<h4>quem mais ouviu</h4>
+<ul id="ranking"></ul>
 </div>
 
 <script src="script.js"></script>

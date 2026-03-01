@@ -1,120 +1,108 @@
-function pegarID(url) {
-    try {
-        const u = new URL(url);
+/* ================= CONFIG ================= */
+const BIN_ID = "69a3a338d0ea881f40e37c08";
+const API_KEY = "$2a$10$3CMfF/FfVV3w1S0s.g5ukONquoDg31UjcX97UPlLnx9FIg2m10CIa";
+const URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-        if (u.hostname.includes("youtu.be"))
-            return u.pathname.slice(1);
+/* ================= USER ================= */
+let username=null;
+let tempo=0;
+let ativo=true;
 
-        if (u.searchParams.get("v"))
-            return u.searchParams.get("v");
+window.addEventListener("DOMContentLoaded", async ()=>{
 
-        if (u.pathname.includes("/shorts/"))
-            return u.pathname.split("/shorts/")[1];
+    const saved=localStorage.getItem("sonifero_nome");
+    const popup=document.getElementById("namePopup");
 
-    } catch {
-        return null;
+    if(!saved){
+        popup.style.display="flex";
+    }else{
+        username=saved;
+        popup.style.display="none";
+        iniciarSessao();
     }
+
+    atualizarRankingGlobal();
+    setInterval(atualizarRankingGlobal,5000);
+});
+
+function salvarNome(){
+    const nome=document.getElementById("usernameInput").value.trim();
+    if(nome.length<2) return;
+
+    localStorage.setItem("sonifero_nome",nome);
+    username=nome;
+    document.getElementById("namePopup").style.display="none";
+    iniciarSessao();
 }
 
-let historico=[];
+/* ================= BANCO ================= */
 
-async function pegarTitulo(id){
-    try{
-        const res=await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${id}`);
-        const data=await res.json();
-        return data.title||"música desconhecida";
-    }catch{
-        return"música desconhecida";
-    }
+async function pegarDB(){
+    const r=await fetch(URL,{headers:{ "X-Master-Key":API_KEY }});
+    const d=await r.json();
+    return d.record;
 }
 
-async function tocar(){
-    const link=document.getElementById("link").value.trim();
-    const id=pegarID(link);
-
-    if(!id){alert("link inválido");return;}
-
-    const embed=`https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}`;
-    document.getElementById("videoFrame").src=embed;
-
-    /* thumbnail */
-    document.getElementById("thumb").src=`https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-
-    const titulo=await pegarTitulo(id);
-    document.getElementById("nomeMusica").textContent=titulo;
-    document.getElementById("audioTitulo").textContent=titulo;
-
-    historico.unshift(titulo);
-    if(historico.length>5)historico.pop();
-    document.getElementById("historicoLista").innerHTML=historico.map(m=>`<li>${m}</li>`).join("");
-
-    /* sempre inicia no modo audio */
-    const audio=document.getElementById("audioPlayer");
-    const video=document.getElementById("videoBox");
-
-    video.style.display="none";
-    audio.style.display="flex";
-    audio.classList.add("fadeIn");
+async function salvarDB(data){
+    await fetch(URL,{
+        method:"PUT",
+        headers:{
+            "Content-Type":"application/json",
+            "X-Master-Key":API_KEY
+        },
+        body:JSON.stringify(data)
+    });
 }
 
-/* mostrar vídeo com animação */
-function mostrarVideo(){
-    const audio = document.getElementById("audioPlayer");
-    const video = document.getElementById("videoBox");
+/* ================= SESSÃO ================= */
 
-    audio.classList.remove("fadeIn");
-    audio.classList.add("fadeOut");
+async function iniciarSessao(){
 
-    setTimeout(()=>{
-        audio.style.display="none";
+    setInterval(async ()=>{
+        if(!ativo) return;
 
-        video.style.display="block";
-        video.classList.remove("fadeOut");
-        video.classList.add("fadeIn");
-    },300);
+        tempo++;
+        const db=await pegarDB();
+
+        if(!db.usuarios[username])
+            db.usuarios[username]={tempo:0,online:true};
+
+        db.usuarios[username].tempo++;
+        db.usuarios[username].online=true;
+
+        await salvarDB(db);
+    },1000);
 }
 
-/* voltar pro áudio */
-function ocultarVideo(){
-    const audio = document.getElementById("audioPlayer");
-    const video = document.getElementById("videoBox");
+/* parar ao sair */
+window.addEventListener("beforeunload",async ()=>{
+    ativo=false;
+    const db=await pegarDB();
+    if(db.usuarios[username])
+        db.usuarios[username].online=false;
+    await salvarDB(db);
+});
 
-    video.classList.remove("fadeIn");
-    video.classList.add("fadeOut");
+/* ================= RANKING GLOBAL ================= */
 
-    setTimeout(()=>{
-        video.style.display="none";
+async function atualizarRankingGlobal(){
 
-        audio.style.display="flex";
-        audio.classList.remove("fadeOut");
-        audio.classList.add("fadeIn");
-    },300);
+    const db=await pegarDB();
+    const lista=Object.entries(db.usuarios)
+        .sort((a,b)=>b[1].tempo-a[1].tempo)
+        .slice(0,8);
+
+    ranking.innerHTML="";
+
+    lista.forEach(([nome,data])=>{
+        const li=document.createElement("li");
+        li.textContent=`${nome} — ${formatarTempo(data.tempo)} ${data.online?"●":""}`;
+        ranking.appendChild(li);
+    });
 }
 
-/* frases */
-const frases=[
-"memória não desliga",
-"noite sempre pensa demais",
-"ninguém percebeu",
-"eu só fiquei quieto",
-"tudo ecoa depois",
-"a mente não dorme",
-"saudade sem nome",
-"tempo lento demais"
-];
-
-function spawnFrase(){
-    const el=document.createElement("div");
-    el.className="frase";
-    el.textContent=frases[Math.floor(Math.random()*frases.length)];
-
-    el.style.top=Math.random()*100+"vh";
-    el.style.animationDuration=(20+Math.random()*40)+"s";
-    el.style.fontSize=(14+Math.random()*10)+"px";
-    el.style.opacity=0.35+Math.random()*0.5;
-
-    document.getElementById("frasesBg").appendChild(el);
-    setTimeout(()=>el.remove(),60000);
+function formatarTempo(s){
+    const m=Math.floor(s/60);
+    const sec=s%60;
+    return `${m}m ${sec}s`;
 }
-
-setInterval(spawnFrase,1200);
